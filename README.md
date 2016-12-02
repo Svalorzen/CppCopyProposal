@@ -417,6 +417,23 @@ This feature could however present problems when the members changed also alter
 behavior and/or variable types of non-modified member and non-member functions,
 since the new behavior could be either erroneous or ambiguous.
 
+### Extending Primitive Types (Optional) ###
+
+The same syntax could be used in order to extend primitive types. Using the
+extension that allows the modification of the copied types, this could allow for
+creation of numeric types where some operations are disabled as needed.
+
+```cpp
+struct Id : using int {
+    Id operator+(Id, Id) = delete;
+    Id operator*(Id, Id) = delete;
+    // Non-explicitly deleted operators keep their validity
+
+    // Defining new operators with the old type can allow interoperativity
+    Id operator+(Id, int);
+};
+```
+
 ### STL Traits (Optional) ###
 
 Traits could be included in the standard library in order to determine whether a
@@ -441,12 +458,3 @@ Compatibility
 -------------
 
 As the syntax is new, no old code would be affected.
-
-Possible Extensions
--------------------
-
-It could possibly be useful if a similar approach could be used in order to
-extend in the same way primitive types, so that specific overloads may be
-implemented for different types, while at the same time preventing the
-compilation of operations that are currently allowed but should not be (e.g.
-summing meters to feet).
