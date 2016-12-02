@@ -431,7 +431,24 @@ struct Id : using int {
 
     // Defining new operators with the old type can allow interoperativity
     Id operator+(Id, int);
+    // We can convert the copied type to the old one.
+    int operator int() { return (*this) * 2; }
 };
+
+/* Equivalent to
+
+class Id {
+    public:
+        Id operator/(Id lhs, Id rhs) { return Id{lhs.v_ / rhs.v_}; }
+        Id operator-(Id lhs, Id rhs) { return Id{lhs.v_ - rhs.v_}; }
+
+        Id operator+(Id, int);
+        int operator int() { return v_ * 2; }
+    private:
+        int v_;
+};
+
+*/
 ```
 
 ### STL Traits (Optional) ###
