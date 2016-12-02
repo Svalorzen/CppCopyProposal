@@ -381,12 +381,36 @@ struct Base {
 struct Copy1 : using Base {
     Copy1() = default;
     void baz();
+    void foo() = delete;
 };
 
+/* Equivalent to
+
+struct Copy1 {
+    Copy1() = default;
+    void bar();
+    void baz();
+};
+
+*/
+
 struct Copy2 : using Base {
-    Copy2() = default;
+    Copy2(int);
     void abc();
 };
+
+/*
+
+Equivalent to
+
+struct Copy2 {
+    Copy2(int);
+    void foo();
+    void bar();
+    void abc();
+};
+
+*/
 ```
 
 This feature could however present problems when the members changed also alter
