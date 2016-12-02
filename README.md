@@ -218,7 +218,7 @@ struct B<double> { double y; double u; };
 */
 ```
 
-The copied class can add additional specialization. Or specializations for a
+The copied class can add additional specializations. Or specializations for a
 given class can copy another.
 
 ```cpp
@@ -296,7 +296,7 @@ struct C {
 
 `using class` has been used in order to disambiguate it from normal `using`
 alias directive. `using class` is only valid when the left hand side has been
-declared as a copy of the right hand side.
+defined as a copy of the right hand side.
 
 In case of a template base class using a template second class, one could
 specify different copies for certain specializations;
