@@ -417,7 +417,7 @@ This feature could however present problems when the members changed also alter
 behavior and/or variable types of non-modified member and non-member functions,
 since the new behavior could be either erroneous or ambiguous.
 
-### Extending Primitive Types (Optional) ###
+### Copying and Extending Primitive Types (Optional) ###
 
 The same syntax could be used in order to extend primitive types. Using the
 extension that allows the modification of the copied types, this could allow for
@@ -437,7 +437,7 @@ struct Id : using int {
 
 /* Equivalent to
 
-class Id {
+class Id final {
     public:
         Id operator/(Id lhs, Id rhs) { return Id{lhs.v_ / rhs.v_}; }
         Id operator-(Id lhs, Id rhs) { return Id{lhs.v_ - rhs.v_}; }
@@ -450,6 +450,10 @@ class Id {
 
 */
 ```
+
+Note that when copying from a primitive types inheritance is forbidden as the
+generated copy is `final` (although it is allowed to keep copying the newly
+created class).
 
 ### STL Traits (Optional) ###
 
