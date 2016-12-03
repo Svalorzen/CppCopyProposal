@@ -6,7 +6,8 @@ Introduction
 
 This document describes a possible approach to duplicate existing functionality
 while wrapping it in a new type, without the burden of inheritance and to allow
-function overloads on syntactically identical but semantically different types.
+function overloads on syntactically identical but semantically different types
+(also known as *strong typedef*).
 
 The approach taken should be simple to implement and be applicable to existing
 code.
@@ -96,11 +97,42 @@ In addition, class extension through templates is not possible: variations would
 need to be made through specialization, which itself requires copying existing
 code.
 
+Previous Work
+-------------
+
+Strong typedefs have already been proposed for the C++ language multiple times
+([N1706](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2004/n1706.pdf),
+[N1891](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2005/n1891.pdf),
+[N3515](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3515.pdf),
+[N3741](https://isocpp.org/files/papers/n3741.pdf)). These typedefs are named
+*opaque typedefs*, and these papers try to explore and define exactly the
+behavior that such typedefs should and would have when used to create new
+types. In particular, the keywords `public`, `protected` and `private` are used
+in order to create a specific relation with the original type and how is the
+new type allowed to be cast back to the original type or be used in its place
+during overloads.
+
+This document shares many of the the same principles, for example (quoting from
+N3741):
+
+> - Consistent with restrictions imposed on analogous relationships such as
+>   base classes underlying derived classes and integer types underlying enums,
+>   an underlying type should be (1) complete and (2) not cv-qualiﬁed. We also do
+>   not require that any enum type, reference type, array type, function type, or
+>   pointer-to-member type be allowed as an underlying type.
+
+However, this document tries to propose a possibly more simple approach, where
+a new language feature is introduced with the same meaning and functionality as
+if the user autonomously implemented a new class him/herself, matching the
+original type completely. Thus, it should result for the user more simple to
+understand (as it simply matches already the already understood mechanics of
+creating a new, unique type from nothing), and no new rules for type conversion
+and selection on overloads have to be created.
+
 Syntax
 ------
 
 ### Simple Case ###
-
 
 Syntax could look something like this:
 
