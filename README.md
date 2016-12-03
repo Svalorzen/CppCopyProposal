@@ -160,8 +160,9 @@ struct Copy {
 */
 ```
 
-One cannot copy a class and inherit at the same time. If such a feature is
-needed one would need to create a class ex novo, as it would be done normally.
+One cannot copy a class and inherit at the same time. If such a class is needed
+one would need to create it by hand with the desided functionality and
+inheriting from the desired classes, as it would be done normally.
 
 All method implementations would be the same. The copied class would inherit
 from the same classes its base class inherits from. All constructors would work
