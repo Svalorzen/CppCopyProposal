@@ -184,9 +184,13 @@ struct Base {
     void foo() { std::cout << "foo\n"; }
 };
 
+struct Derived : public Base {};
+
 struct Copy : using Base {
     void bar() { std::cout << "bar\n"; }
 };
+
+struct CopyDerived : using Derived {};
 
 /* Equivalent to
 
@@ -194,6 +198,8 @@ struct Copy {
     void foo() { std::cout << "foo\n"; }
     void bar() { std::cout << "bar\n"; }
 };
+
+struct CopyDerived : public Base {};
 
 */
 ```
