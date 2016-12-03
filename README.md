@@ -295,7 +295,7 @@ struct B : using A<T, double> {};
 /* Equivalent to
 
 template <typename T>
-struct B { T t; double u; }
+struct B { T t; double u; };
 
 template <>
 struct B<double> { double y; double u; };
@@ -327,12 +327,35 @@ template<>
 struct A<int> { char c; };
 
 template <typename T>
-struct C { int x; }
+struct C { int x; };
 
 template <>
 struct C<double> { char c; };
 
 */
+
+```
+
+### Templated Class Copy ###
+
+The user might want to create a single templatized copy interface, and use it
+multiple times. For example, one might want multiple copied classes which can
+sum with their original. This could be done as follows:
+
+```cpp
+
+struct A {};
+
+template <typename T>
+struct TemplatizedCopy : using T {
+    T & operator T() { return *reinterpret_cast<T*>(this); }
+};
+
+// Could be used either via normal typedefs
+using Copy1 = TemplatizedCopy<A>;
+
+// Or via copy, depending on requirements.
+struct Copy2 : using TemplatizedCopy<A> {};
 
 ```
 
