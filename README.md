@@ -252,7 +252,7 @@ p + p; // Error
 
 The user might want to create a single templatized copy interface, and use it
 multiple times. For example, one might want multiple copied classes which can
-sum with their original. This could be done as follows:
+convert to their original. This could be done as follows:
 
 ```cpp
 
