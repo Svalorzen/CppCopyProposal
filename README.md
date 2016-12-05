@@ -246,6 +246,10 @@ struct Copy : using Base {
 };
 ```
 
+In general the usual rules of `reinterpret\_cast` apply to the copied classes
+with respect to their general classes, exactly as if the copied class had been
+implemented by hand.
+
 ### Overloads ###
 
 Duplicating an existing class should allow for new overloads on the new type,
