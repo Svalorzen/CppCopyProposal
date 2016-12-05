@@ -218,13 +218,33 @@ would copy the new, more compatible interface with it.
 struct Base {};
 
 struct Copy : using Base {
-    Base & operator Base() { return *reinterpret_cast<Base*>(this); }
+    operator Base&() { return *reinterpret_cast<Base*>(this); }
 };
 ```
 
 This may also work even if the user adds new member attributes to the copy, as
 they would get created after the base ones, possibly allowing for
 `reinterpret\_cast` to still work.
+
+Note that the `reinterpret\_cast` may produce undefined behaviour if substantial
+alterations are added to the original class, as per standard `reinterpret\_cast`
+rules. In such cases one would have to manually map the copied class to the
+original in some way.
+
+```cpp
+struct Base { int x; };
+
+struct Copy : using Base {
+    virtual void foo() {}
+
+    operator Base&() {
+        // Undefined behavior!
+        return *reinterpret_cast<Base*>(this);
+    }
+
+    operator Base() { return Base{x}; };
+};
+```
 
 ### Overloads ###
 
@@ -261,12 +281,11 @@ multiple times. For example, one might want multiple copied classes which can
 convert to their original. This could be done as follows:
 
 ```cpp
-
 struct A {};
 
 template <typename T>
 struct TemplatizedCopy : using T {
-    T & operator T() { return *reinterpret_cast<T*>(this); }
+    operator T&() { return *reinterpret_cast<T*>(this); }
 };
 
 // Could be used either via normal typedefs
@@ -274,7 +293,6 @@ using Copy1 = TemplatizedCopy<A>;
 
 // Or via copy, depending on requirements.
 struct Copy2 : using TemplatizedCopy<A> {};
-
 ```
 
 ### Copying Template Classes ###
@@ -362,7 +380,6 @@ template <>
 struct C<double> { char c; };
 
 */
-
 ```
 
 ### Copying Multiple Dependent Classes ###
@@ -520,7 +537,7 @@ struct Id : using int {
     // Defining new operators with the old type can allow interoperativity
     Id operator+(Id, int);
     // We can convert the copied type to the old one.
-    int operator int() { return (*this) * 2; }
+    operator int() { return (*this) * 2; }
 };
 
 /* Equivalent to
@@ -531,7 +548,7 @@ class Id final {
         Id operator-(Id lhs, Id rhs) { return Id{lhs.v_ - rhs.v_}; }
 
         Id operator+(Id, int);
-        int operator int() { return v_ * 2; }
+        operator int() { return v_ * 2; }
     private:
         int v_;
 };
