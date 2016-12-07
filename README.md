@@ -15,18 +15,21 @@ code.
 Reasons
 -------
 
-- Scientific libraries where a vector of double has different behaviors
-  depending on context have currently no simple way to indicate the semantic
-  differences. Since a `typedef` does not allow multiple overloads on new
-  typedef types - since they are still the "old" type - they have to resort to
-  imperfect techniques, such as copying, wrapping or inheriting the needed type.
+- Scientific libraries where a type has different behaviors depending on context
+  have currently no simple way to indicate the semantic differences. Since a
+  `typedef` does not allow multiple overloads on new typedef types - since they
+  are still the "old" type - they have to resort to imperfect techniques, such
+  as copying, wrapping or inheriting the needed type. Examples: coordinates in a
+  plane (rectangular, polar), vectors of double (probabilities, values).
 - Easier maintainability of code which is known to be the same, rather than
   being copy-pasted.
-- Searching for "`std::vector` inheritance" yields many results of users trying
-  to maintain the original interface and functionality but add one or two methods.
-- Very often inheritance is misused in order to provide a copy-paste
-  alternative. This can result in very deep hierarchies of types which should
-  really not have anything to do with each other.
+- Avoiding misuse of inheritance in order to provide a copy-paste alternative.
+  This can result in very deep hierarchies of types which should really not have
+  anything to do with each other.
+- Enabling users to use an existing and presumably correct type but partially
+  extend it with context-specific methods. Examples: search for "`std::vector`
+  inheritance" yields many results of users trying to maintain the original
+  interface and functionality but add one or two methods.
 
 The functionality should have the following requirements:
 
