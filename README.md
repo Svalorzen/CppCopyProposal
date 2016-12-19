@@ -121,11 +121,6 @@ N3741):
 >   an underlying type should be (1) complete and (2) not cv-qualiﬁed. We also do
 >   not require that any enum type, reference type, array type, function type, or
 >   pointer-to-member type be allowed as an underlying type.
-> - Mutual substitutability should be always permitted by explicit request,
->   using either constructor notation or a suitable cast notation, e.g.,
->   `reinterpret_cast`. Such a type adjustment conversion between an opaque
->   type and its underlying type (in either direction) is expected to have no
->   run-time cost.
 
 However, this document tries to propose a possibly more simple approach, where
 a new language feature is introduced with the same meaning and functionality as
@@ -215,36 +210,21 @@ one would only need to implement them once, since copying the produced type
 would copy the new, more compatible interface with it.
 
 ```cpp
-struct Base {};
+struct Base {
+    public:
+        int x;
+
+    private:
+        double y;
+};
 
 struct Copy : using Base {
-    operator Base&() { return *reinterpret_cast<Base*>(this); }
+    operator Base() { return Base{x, y}; }
 };
 ```
 
-This may also work even if the user adds new member attributes to the copy, as
-they would get created after the base ones, possibly allowing for
-`reinterpret_cast` to still work.
-
-Note that the `reinterpret_cast` may produce undefined behaviour if substantial
-alterations are added to the original class, as per standard `reinterpret_cast`
-rules. In such cases one would have to manually map the copied class to the
-original in some way.
-
-```cpp
-struct Base { int x; };
-
-struct Copy : using Base {
-    virtual void foo() {}
-
-    operator Base&() {
-        // Undefined behavior!
-        return *reinterpret_cast<Base*>(this);
-    }
-
-    operator Base() { return Base{x}; };
-};
-```
+`reinterpret_cast` may also be used to convert back to the original class,
+limited by the tool's already existing rules.
 
 In general the usual rules of `reinterpret_cast` apply to the copied classes
 with respect to their general classes, exactly as if the copied class had been
@@ -285,10 +265,13 @@ multiple times. For example, one might want multiple copied classes which can
 convert to their original. This could be done as follows:
 
 ```cpp
-struct A {};
+struct A { int x; };
 
 template <typename T>
 struct TemplatizedCopy : using T {
+    static_assert(std::is_standard_layout<T>::value,
+                  "Can't use this with a non-standard-layout class");
+
     operator T&() { return *reinterpret_cast<T*>(this); }
 };
 
