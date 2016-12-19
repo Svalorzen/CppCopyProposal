@@ -122,11 +122,10 @@ N3741):
 >   not require that any enum type, reference type, array type, function type, or
 >   pointer-to-member type be allowed as an underlying type.
 > - Mutual substitutability should be always permitted by explicit request,
->   using either construc- tor notation or a suitable cast notation, e.g.,
->   `reinterpret\_cast`. Such a type adjustment conversion between an opaque type
->   and its underlying type (in either direction) is expected to have no run-time
->   cost.
-
+>   using either constructor notation or a suitable cast notation, e.g.,
+>   `reinterpret_cast`. Such a type adjustment conversion between an opaque
+>   type and its underlying type (in either direction) is expected to have no
+>   run-time cost.
 
 However, this document tries to propose a possibly more simple approach, where
 a new language feature is introduced with the same meaning and functionality as
@@ -225,10 +224,10 @@ struct Copy : using Base {
 
 This may also work even if the user adds new member attributes to the copy, as
 they would get created after the base ones, possibly allowing for
-`reinterpret\_cast` to still work.
+`reinterpret_cast` to still work.
 
-Note that the `reinterpret\_cast` may produce undefined behaviour if substantial
-alterations are added to the original class, as per standard `reinterpret\_cast`
+Note that the `reinterpret_cast` may produce undefined behaviour if substantial
+alterations are added to the original class, as per standard `reinterpret_cast`
 rules. In such cases one would have to manually map the copied class to the
 original in some way.
 
@@ -247,7 +246,7 @@ struct Copy : using Base {
 };
 ```
 
-In general the usual rules of `reinterpret\_cast` apply to the copied classes
+In general the usual rules of `reinterpret_cast` apply to the copied classes
 with respect to their general classes, exactly as if the copied class had been
 implemented by hand.
 
