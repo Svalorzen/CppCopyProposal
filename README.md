@@ -31,9 +31,9 @@ Reasons
   This can result in very deep hierarchies of types which should really not have
   anything to do with each other.
 - Enabling users to use an existing and presumably correct type but partially
-  extend it with context-specific methods. Examples: search for "`std::vector`
-  inheritance" yields many results of users trying to maintain the original
-  interface and functionality but add one or two methods.
+  extend it with context-specific methods. Examples: searching for
+  "`std::vector` inheritance" yields many results of users trying to maintain
+  the original interface and functionality but add one or two methods.
 
 The functionality should have the following requirements:
 
@@ -139,7 +139,7 @@ Syntax
 
 ### Simple Case ###
 
-Syntax could look something like this:
+A strong typedef is defined as follows:
 
 ```cpp
 class Base {
@@ -165,18 +165,29 @@ struct Copy {
 */
 ```
 
-One cannot copy a class and inherit at the same time. If such a class is needed
-one would need to create it by hand with the desided functionality and
+We refer to the newly created class as the *type-copy* of the original class. We
+can refer to the original class as the *type-base* of the *type-copy*. One
+cannot type-copy a class and inherit at the same time. If such a new class was
+needed one would need to create it by hand with the desired functionality and
 inheriting from the desired classes, as it would be done normally.
 
-All method implementations would be the same. The copied class would inherit
-from the same classes its base class inherits from. All constructors would work
-in the same way.
+All method implementations for the type-copy would be the same. The type-copy
+would inherit from the same classes its type-base inherits from. All
+constructors would work in the same way.
+
+As the proposed syntax is also used in
+[P0352R0](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0352r0.pdf),
+an alternative syntax could be used:
+
+```cpp
+struct Copy = Base {};
+```
 
 ### Adding New Functionality ###
 
-Ideally one could specify additional methods, separate from that of Base, to add
-upon the existing functionality.
+A type-copy is allowed to define additional methods upon definition, as it would
+be done in a normal class definition. The type-copy has access to all its
+members in the same way the type-base has access to its own.
 
 ```cpp
 struct Base {
@@ -203,15 +214,15 @@ struct CopyDerived : public Base {};
 */
 ```
 
-Only new methods need to be implemented for that class.
+The type-copy shall have to implement all newly declared methods.
 
 #### Interfacing with the Original Class ####
 
-In order to interface with the original class, simple conversion operators can
-be added by the user explicitly at-will, in order to obtain the desired
-interface. Note that if more types with this kind of compatibility were needed,
-one would only need to implement them once, since copying the produced type
-would copy the new, more compatible interface with it.
+In order to interface with a type-base, simple conversion operators can be added
+by the user explicitly if needed, in order to obtain the desired interface. Note
+that if more types with this kind of compatibility were needed, one would only
+need to implement them once, since recursively type-copying the type-copy would
+duplicate the new, more compatible interface with it.
 
 ```cpp
 struct Base {
@@ -236,9 +247,10 @@ implemented by hand.
 
 ### Overloads ###
 
-Duplicating an existing class should allow for new overloads on the new type,
-and no ambiguity between the copied class, the old class and other copied
-classes.
+A type-copy is a new, unique type, which cannot be substituted with its
+type-base nor other type-copies of any kind - unless appropriate conversion
+operators are explicitly added by the user. Overloads are resolved as if each
+type-copy is a unique type.
 
 ```cpp
 class Position : using std::pair<double, double> {};
@@ -262,11 +274,57 @@ d + d; // OK
 p + p; // Error
 ```
 
-### Templated Class Copy ###
+### Nested Types, Friends and Non-Members ###
 
-The user might want to create a single templatized copy interface, and use it
-multiple times. For example, one might want multiple copied classes which can
-convert to their original. This could be done as follows:
+A type-copy brings with it all types and entities that directly depend on its
+base-type. However, it does **not** include friends, nor it creates type-copies
+of non-member functions.
+
+```cpp
+
+struct Base {
+    struct Nested {};
+
+    void useNested(Nested);
+
+    friend void foo(Base);
+    friend void bar() { std::cout << "bar\n"; }
+};
+
+void foo(Base b);
+void baz(Base::Nested n);
+
+struct Copy : using Base {};
+
+/* Equivalent to
+
+struct Copy {
+    struct Nested {};
+
+    void useNested(Nested);
+};
+
+*/
+```
+
+Such methods, if not templatized, would need to be implemented by hand. Friend
+declarations would also need to be inserted by hand into the type-copy.
+
+Methods to create type-copies of non-member methods have been considered, but
+have been found inappropriate to bundle in this proposal. The reason is that
+once a mechanism to type-copy a method has been established, it should be
+general, and not only bound to type-copies. Such a change alone would have a
+scope similar to this proposal, and so it was not included here.
+
+Please note that while this limitation could drastically reduce the usefulness
+of this feature in some cases, usually most classes are not so much dependent on
+non-members that this would be a problem in practice. We argue that having
+strong typing in C++ is better than not having it, even if in certain situations
+it is of limited use.
+
+### Templated Type-Copy ###
+
+Type-copies can be templatized.
 
 ```cpp
 struct A { int x; };
@@ -286,10 +344,9 @@ using Copy1 = TemplatizedCopy<A>;
 struct Copy2 : using TemplatizedCopy<A> {};
 ```
 
-### Copying Template Classes ###
+### Type-Copy of Template Classes ###
 
-Since the construct is similar to inheritance, the syntax for creating aliases
-of templated classes could be the same:
+A templated type-copy is allowed to use the template parameter on its type-base.
 
 ```cpp
 template <typename T>
@@ -301,8 +358,8 @@ struct B : using A<T> {};
 B<int> b;
 ```
 
-The copied class must have the same number or less of template parameters than
-the base class. Partial or full specializations of the base class can be allowed:
+The type-copy must have the same number or less of template parameters than its
+type-base. Partial or full specializations of the type-base are allowed:
 
 ```cpp
 template <typename T, typename U>
@@ -314,8 +371,8 @@ struct B : using A<T, double> {};
 B<int> b;
 ```
 
-When the base class has partial specializations, only those who apply are copied
-to the copied class.
+When the type-base has partial specializations, the type-copy includes all those
+that are still applicable on its parameters.
 
 ```cpp
 template <typename T, typename U>
@@ -341,8 +398,8 @@ struct B<double> { double y; double u; };
 */
 ```
 
-The copied class can add additional specializations. Or specializations for a
-given class can copy another.
+A templated type-copy is allowed to implement specialization independently of
+its type-base. A template specialization can type-copy another class.
 
 ```cpp
 template <typename T>
@@ -373,12 +430,14 @@ struct C<double> { char c; };
 */
 ```
 
-### Copying Multiple Dependent Classes ###
+### Type-Copy of Multiple Dependent Classes ###
 
-Copying multiple classes using the simple syntax we have described can be
+Type-copying multiple classes using the simple syntax we have described can be
 impossible if those classes depend on one another. This is because each copy
-would depend on the originals, rather than on the copied classes. A possible way
-to specify such dependencies could be:
+would depend on the originals, rather than on the copied classes.
+
+A type-copy is allowed to substitute any used class in its type-base for another
+class, given that the substitution is a type-copy of the substituted class.
 
 ```cpp
 struct A;
@@ -418,143 +477,12 @@ struct C {
 
 `using class` has been used in order to disambiguate it from normal `using`
 alias directive. `using class` is only valid when the left hand side has been
-defined as a copy of the right hand side.
+defined as a type-copy of the right hand side.
 
-In case of a template base class using a template second class, one could
-specify different copies for certain specializations;
+### STL Traits ###
 
-```cpp
-template <typename T>
-struct A {};
-
-template <typename T>
-struct B {
-    A<T> a;
-};
-
-template <typename T>
-struct C : using A<T> {};
-
-```
-
-### Substituting Existing Functionality (Optional) ###
-
-Ideally one may want to use most of an implementation for another class, but
-vary a certain number of methods. In this case, if `Copy` contains a member
-function that already exists in `Base`, then that implementation is substituted
-in `Copy`. This may or may not be allowed for attributes.
-
-```cpp
-struct Base {
-    void foo() { std::cout << "foo\n"; }
-    void bar() { std::cout << "bar\n"; }
-};
-
-struct Copy : using Base {
-    void foo() { std::cout << "baz\n"; }
-};
-
-/* Equivalent to
-
-struct Copy {
-    void foo() { std::cout << "baz\n"; }
-    void bar() { std::cout << "bar\n"; }
-};
-
-*/
-```
-
-A side effect of this is that it could allow for some type of "interface", where
-some base class could be defined as:
-
-```cpp
-struct Base {
-    Base() = delete;
-    void foo();
-    void bar();
-};
-
-struct Copy1 : using Base {
-    Copy1() = default;
-    void baz();
-    void foo() = delete;
-};
-
-/* Equivalent to
-
-struct Copy1 {
-    Copy1() = default;
-    void bar();
-    void baz();
-};
-
-*/
-
-struct Copy2 : using Base {
-    Copy2(int);
-    void abc();
-};
-
-/*
-
-Equivalent to
-
-struct Copy2 {
-    Copy2(int);
-    void foo();
-    void bar();
-    void abc();
-};
-
-*/
-```
-
-This feature could however present problems when the members changed also alter
-behavior and/or variable types of non-modified member and non-member functions,
-since the new behavior could be either erroneous or ambiguous.
-
-### Copying and Extending Primitive Types (Optional) ###
-
-The same syntax could be used in order to extend primitive types. Using the
-extension that allows the modification of the copied types, this could allow for
-creation of numeric types where some operations are disabled as needed.
-
-```cpp
-struct Id : using int {
-    Id operator+(Id, Id) = delete;
-    Id operator*(Id, Id) = delete;
-    // Non-explicitly deleted operators keep their validity
-
-    // Defining new operators with the old type can allow interoperativity
-    Id operator+(Id, int);
-    // We can convert the copied type to the old one.
-    operator int() { return (*this) * 2; }
-};
-
-/* Equivalent to
-
-class Id final {
-    public:
-        Id operator/(Id lhs, Id rhs) { return Id{lhs.v_ / rhs.v_}; }
-        Id operator-(Id lhs, Id rhs) { return Id{lhs.v_ - rhs.v_}; }
-
-        Id operator+(Id, int);
-        operator int() { return v_ * 2; }
-    private:
-        int v_;
-};
-
-*/
-```
-
-Note that when copying from a primitive types inheritance is forbidden as the
-generated copy is `final` (although it is allowed to keep copying the newly
-created class).
-
-### STL Traits (Optional) ###
-
-Traits could be included in the standard library in order to determine whether a
-class is a copy of another, or if it has been derived from a copy
+Traits should be included in the standard library in order to determine whether
+a class is a type-copy of another, or if it has been derived from a type-copy
 (copies/inheritances could be nested arbitrarily).
 
 ```cpp
@@ -562,13 +490,70 @@ struct Base {};
 
 struct Copy : using Base {};
 
-static_assert(std::is_copy<Copy, Base>::value);
+static_assert(std::is_copy_of<Copy, Base>::value);
 
 struct ChildCopy : public Copy {};
 
 struct CopyChildCopy : using ChildCopy {};
 
 static_assert(std::is_copy_base_of<Base, CopyChildCopy>::value);
+```
+
+### Primitive Types ###
+
+Strong typedefs are often discussed in terms of primitive types. However, this
+proposal does *not* extend to primitive types. While doing so would be nice, it
+seems to be hard to define a good, intuitive and useful way to create such
+strong typedefs.
+
+The main problem of creating a primitive type strong typedef is that the
+handling of all original operators - whether they should still work or not, and
+whether they should be compatible with the original type - depends heavily on
+context. Serial numbers should not be multiplied, for example. However, manually
+specifying whether each operator should be present or not is a very dull task.
+
+While wrapping a primitive type in a small class and exposing only the needed
+operators can work, this process becomes tedious to do many times, since
+inheritance cannot be used lest risk unwanted conversions.
+
+However, this proposal makes wrapping and incrementally exposing operators easy,
+removes code duplication and prevents any unwanted conversions. While not
+perfect in all cases, as still some code must be written to expose global
+operators with base-types (as those are not copied), we argue that this system
+can still be useful in dealing with this problem.
+
+Once created, wrapper types can then be copied indefinitely when needed, and
+thus allow for a robust and efficient way to substitute for a lack of primitive
+type strong typedefs.
+
+```cpp
+class IntWrapper final {
+    public:
+        IntWrapper() : v_(0) {}
+        explicit IntWrapper(int v) : v_(v) {}
+        IntWrapper(const IntWrapper & other) : v_(other.v_) {}
+
+    private:
+        int v_;
+};
+
+struct IntWrapperAsInt : using IntWrapper {
+    operator int() { return v_; }
+};
+
+struct IntWrapperWithSum : using IntWrapper {
+    IntWrapperWithSum operator+(IntWrapperWithSum other) {
+        return v_ + other.v_;
+    }
+};
+
+struct IntWrapperWithAlgebra : using IntWrapperWithSum {
+    // And so on...
+    IntWrapperWithAlgebra operator-(IntWrapperWithAlgebra other);
+    IntWrapperWithAlgebra operator/(IntWrapperWithAlgebra other);
+    IntWrapperWithAlgebra operator*(IntWrapperWithAlgebra other);
+    IntWrapperWithAlgebra operator%(IntWrapperWithAlgebra other);
+};
 ```
 
 Compatibility
