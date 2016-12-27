@@ -12,10 +12,6 @@ function overloads on syntactically identical but semantically different types
 The approach taken should be simple to implement and be applicable to existing
 code.
 
-Optional sections are to be read as additional ideas that could be further
-developed or completely ignored. They are mostly food for thought, but included
-for completeness.
-
 Reasons
 -------
 
