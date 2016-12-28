@@ -279,12 +279,17 @@ depend on the base-type. It also results in the duplication of aliases. However,
 it does **not** include friends, nor it creates type-copies of non-member
 functions.
 
+While in a type-copy context, all nested types can be extended as if they were
+being type-copied themselves.
+
 ```cpp
 
 struct Base {
     using X = int;
 
-    struct Nested {};
+    struct Nested {
+        double proc();
+    };
 
     void useNested(Nested);
 
@@ -295,14 +300,21 @@ struct Base {
 void foo(Base b);
 void baz(Base::Nested n);
 
-struct Copy : using Base {};
+struct Copy : using Base {
+    struct Nested {
+        int func();
+    };
+};
 
 /* Equivalent to
 
 struct Copy {
     using X = int;
 
-    struct Nested {};
+    struct Nested {
+        double proc();
+        int func();
+    };
 
     void useNested(Nested);
 };
