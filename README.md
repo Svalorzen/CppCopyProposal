@@ -107,13 +107,13 @@ Strong typedefs have already been proposed for the C++ language multiple times
 [N3515](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3515.pdf),
 [N3741](https://isocpp.org/files/papers/n3741.pdf)). These typedefs are named
 *opaque typedefs*, and these papers try to explore and define exactly the
-behavior that such typedefs should and would have when used to create new
-types. In particular, the keywords `public`, `protected` and `private` are used
-in order to create a specific relation with the original type and how is the
-new type allowed to be cast back to the original type or be used in its place
+behavior that such typedefs should and would have when used to create new types.
+In particular, the keywords `public`, `protected` and `private` are used in
+order to create a specific relation with the original type to determine how the
+new type is allowed to be cast back to the original type or be used in its place
 during overloads.
 
-This document shares many of the the same principles, for example (quoting from
+This document shares many of the same principles, for example (quoting from
 N3741):
 
 > - Consistent with restrictions imposed on analogous relationships such as
@@ -162,7 +162,7 @@ struct Copy {
 ```
 
 We refer to the newly created class as the *type-copy* of the original class. We
-can refer to the original class as the *type-base* of the *type-copy*. One
+also refer to the original class as the *type-base* of the *type-copy*. One
 cannot type-copy a class and inherit at the same time. If such a new class was
 needed one would need to create it by hand with the desired functionality and
 inheriting from the desired classes, as it would be done normally.
@@ -210,7 +210,8 @@ struct CopyDerived : public Base {};
 */
 ```
 
-The type-copy shall have to implement all newly declared methods.
+All newly declared methods in the type-copy must of course be implemented in
+order to be used.
 
 #### Interfacing with the Original Class ####
 
@@ -246,7 +247,8 @@ implemented by hand.
 A type-copy is a new, unique type, which cannot be substituted with its
 type-base nor other type-copies of any kind - unless appropriate conversion
 operators are explicitly added by the user. Overloads are resolved as if each
-type-copy is a unique type.
+type-copy is a unique type. Once again, the general rule of "behaves as if
+implemented by hand" applies.
 
 ```cpp
 class Position : using std::pair<double, double> {};
@@ -272,13 +274,16 @@ p + p; // Error
 
 ### Nested Types, Friends and Non-Members ###
 
-A type-copy brings with it all types and entities that directly depend on its
-base-type. However, it does **not** include friends, nor it creates type-copies
-of non-member functions.
+A type-copy results in the duplication of all types and entities that directly
+depend on the base-type. It also results in the duplication of aliases. However,
+it does **not** include friends, nor it creates type-copies of non-member
+functions.
 
 ```cpp
 
 struct Base {
+    using X = int;
+
     struct Nested {};
 
     void useNested(Nested);
@@ -295,6 +300,8 @@ struct Copy : using Base {};
 /* Equivalent to
 
 struct Copy {
+    using X = int;
+
     struct Nested {};
 
     void useNested(Nested);
@@ -303,20 +310,22 @@ struct Copy {
 */
 ```
 
-Such methods, if not templatized, would need to be implemented by hand. Friend
-declarations would also need to be inserted by hand into the type-copy.
+Such methods, if not templatized, would need to be implemented by hand in order
+to work with the type-copy. Friend declarations would also need to be inserted
+by hand into the type-copy.
 
 Methods to create type-copies of non-member methods have been considered, but
 have been found inappropriate to bundle in this proposal. The reason is that
 once a mechanism to type-copy a method has been established, it should be
-general, and not only bound to type-copies. Such a change alone would have a
-scope similar to this proposal, and so it was not included here.
+general, and not only bound to type-copies. In practice it would result in the
+ability of converting any function into a template. Such a change alone would
+have a scope similar in size to this proposal, and so it was not included here.
 
 Please note that while this limitation could drastically reduce the usefulness
 of this feature in some cases, usually most classes are not so much dependent on
 non-members that this would be a problem in practice. We argue that having
 strong typing in C++ is better than not having it, even if in certain situations
-it is of limited use.
+it is of limited use. No silver bullet exists.
 
 ### Templated Type-Copy ###
 
@@ -342,7 +351,7 @@ struct Copy2 : using TemplatizedCopy<A> {};
 
 ### Type-Copy of Template Classes ###
 
-A templated type-copy is allowed to use the template parameter on its type-base.
+Template classes can be type-copied.
 
 ```cpp
 template <typename T>
@@ -354,8 +363,8 @@ struct B : using A<T> {};
 B<int> b;
 ```
 
-The type-copy must have the same number or less of template parameters than its
-type-base. Partial or full specializations of the type-base are allowed:
+The type-copy must have equal or less template parameters than its type-base.
+Type-copy of partial or full specializations are allowed:
 
 ```cpp
 template <typename T, typename U>
@@ -394,8 +403,9 @@ struct B<double> { double y; double u; };
 */
 ```
 
-A templated type-copy is allowed to implement specialization independently of
-its type-base. A template specialization can type-copy another class.
+A templated type-copy is allowed to implement specializations independently of
+its type-base. However, specializations already present from the type-base
+cannot be overridden. Template specializations can type-copy another class.
 
 ```cpp
 template <typename T>
@@ -412,6 +422,10 @@ struct C<double> : using B {};
 template <>
 struct A<int> : using C<double> {};
 
+// Can't be done, since A<int> creates C<int>
+// template<>
+// struct C<int> {};
+
 /* Equivalent to
 
 template<>
@@ -423,14 +437,17 @@ struct C { int x; };
 template <>
 struct C<double> { char c; };
 
+template <>
+struct C<int> { char c; };
+
 */
 ```
 
 ### Type-Copy of Multiple Dependent Classes ###
 
 Type-copying multiple classes using the simple syntax we have described can be
-impossible if those classes depend on one another. This is because each copy
-would depend on the originals, rather than on the copied classes.
+impossible if those classes depend on each other. This is because each copy
+would depend on the originals, rather than on the newly created type-copies.
 
 A type-copy is allowed to substitute any used class in its type-base for another
 class, given that the substitution is a type-copy of the substituted class.
@@ -551,6 +568,9 @@ struct IntWrapperWithAlgebra : using IntWrapperWithSum {
     IntWrapperWithAlgebra operator%(IntWrapperWithAlgebra other);
 };
 ```
+
+The choice of not extending this syntax to primitive types also mirrors the fact
+that in C++ it is not possible to inherit from primitive types.
 
 Compatibility
 -------------
