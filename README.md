@@ -181,9 +181,13 @@ struct Copy = Base {};
 
 ### Adding New Functionality ###
 
-A type-copy is allowed to define additional methods upon definition, as it would
-be done in a normal class definition. The type-copy has access to all its
-members in the same way the type-base has access to its own.
+A type-copy is allowed to define additional methods and attributes upon
+definition, as it would be done in a normal class definition. The type-copy has
+access to all its members in the same way the type-base has access to its own.
+
+Note that additional attributes will be initialized in type-copied constructors
+in the same way as if they weren't specified at all. Additional constructors can
+be specified if needed.
 
 ```cpp
 struct Base {
@@ -194,6 +198,9 @@ struct Derived : public Base {};
 
 struct Copy : using Base {
     void bar() { std::cout << "bar\n"; }
+
+    int x;      // Unspecified on construction
+    int j = 10; // 10 on construction
 };
 
 struct CopyDerived : using Derived {};
@@ -203,6 +210,9 @@ struct CopyDerived : using Derived {};
 struct Copy {
     void foo() { std::cout << "foo\n"; }
     void bar() { std::cout << "bar\n"; }
+
+    int x;
+    int j = 10;
 };
 
 struct CopyDerived : public Base {};
