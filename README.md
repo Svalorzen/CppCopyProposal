@@ -171,6 +171,9 @@ All method implementations for the type-copy would be the same. The type-copy
 would inherit from the same classes its type-base inherits from. All
 constructors would work in the same way.
 
+Unless where noted, the new class behaves with respect to all C++ rules as if it
+had been implemented by hand.
+
 As the proposed syntax is also used in
 [P0352R0](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0352r0.pdf),
 an alternative syntax could be used:
