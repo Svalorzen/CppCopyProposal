@@ -492,6 +492,18 @@ struct C {
 alias directive. `using class` is only valid when the left hand side has been
 defined as a type-copy of the right hand side.
 
+Similarly, this could be done to type-copy whole hierarchies of classes.
+
+```cpp
+struct A {};
+struct B : A {};
+
+struct C : using A {};
+struct D : using B {
+    using class C = A;
+};
+```
+
 ### STL Traits ###
 
 Traits should be included in the standard library in order to determine whether
