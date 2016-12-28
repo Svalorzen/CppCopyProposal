@@ -310,9 +310,9 @@ struct Copy {
 */
 ```
 
-Such methods, if not templatized, would need to be implemented by hand in order
-to work with the type-copy. Friend declarations would also need to be inserted
-by hand into the type-copy.
+Non-member methods, if not templatized, would need to be implemented by hand in
+order to work with the type-copy. Friend declarations would also need to be
+inserted by hand into the type-copy.
 
 Methods to create type-copies of non-member methods have been considered, but
 have been found inappropriate to bundle in this proposal. The reason is that
