@@ -169,8 +169,9 @@ inheriting from the desired classes, as it would be done normally.
 
 All method implementations for the type-copy would be the same. The type-copy
 would inherit from the same classes its type-base inherits from. All explicitly
-defined constructors would work in the same way. Implicitly defined/deleted
-constructors may be overridden or deleted in the type-copy.
+defined constructors and destructors would work in the same way. Implicitly
+defined/deleted constructors and destructors may be overridden or deleted in the
+type-copy.
 
 ```cpp
 struct A {
