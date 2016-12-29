@@ -146,7 +146,7 @@ class Base {
         int x;
 };
 
-struct Copy : using Base {};
+struct Copy = Base {};
 
 /* Equivalent to
 
@@ -168,19 +168,26 @@ needed one would need to create it by hand with the desired functionality and
 inheriting from the desired classes, as it would be done normally.
 
 All method implementations for the type-copy would be the same. The type-copy
-would inherit from the same classes its type-base inherits from. All
-constructors would work in the same way.
+would inherit from the same classes its type-base inherits from. All explicitly
+defined constructors would work in the same way. Implicitly defined/deleted
+constructors may be overridden or deleted in the type-copy.
+
+```cpp
+struct A {
+    A(int);
+};
+// Impossible to construct
+struct B {
+    A a;
+};
+// Can be constructed
+struct C = B {
+    C(int i) : a(i) {}
+};
+```
 
 Unless where noted, the new class behaves with respect to all C++ rules as if it
 had been implemented by hand.
-
-As the proposed syntax is also used in
-[P0352R0](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0352r0.pdf),
-an alternative syntax could be used:
-
-```cpp
-struct Copy = Base {};
-```
 
 ### Adding New Functionality ###
 
@@ -199,14 +206,14 @@ struct Base {
 
 struct Derived : public Base {};
 
-struct Copy : using Base {
+struct Copy = Base {
     void bar() { std::cout << "bar\n"; }
 
     int x;      // Unspecified on construction
     int j = 10; // 10 on construction
 };
 
-struct CopyDerived : using Derived {};
+struct CopyDerived = Derived {};
 
 /* Equivalent to
 
@@ -243,7 +250,7 @@ struct Base {
         double y;
 };
 
-struct Copy : using Base {
+struct Copy = Base {
     operator Base() { return Base{x, y}; }
 };
 ```
@@ -264,8 +271,8 @@ type-copy is a unique type. Once again, the general rule of "behaves as if
 implemented by hand" applies.
 
 ```cpp
-class Position : using std::pair<double, double> {};
-class Distance : using std::pair<double, double> {};
+class Position = std::pair<double, double> {};
+class Distance = std::pair<double, double> {};
 
 Position operator+(const Position & p, const Distance & d) {
     return Position(p.first + d.first, p.second + d.second);
@@ -313,7 +320,7 @@ struct Base {
 void foo(Base b);
 void baz(Base::Nested n);
 
-struct Copy : using Base {
+struct Copy = Base {
     struct Nested {
         int func();
     };
@@ -360,7 +367,7 @@ Type-copies can be templatized.
 struct A { int x; };
 
 template <typename T>
-struct TemplatizedCopy : using T {
+struct TemplatizedCopy = T {
     static_assert(std::is_standard_layout<T>::value,
                   "Can't use this with a non-standard-layout class");
 
@@ -371,7 +378,7 @@ struct TemplatizedCopy : using T {
 using Copy1 = TemplatizedCopy<A>;
 
 // Or via copy, depending on requirements.
-struct Copy2 : using TemplatizedCopy<A> {};
+struct Copy2 = TemplatizedCopy<A> {};
 ```
 
 ### Type-Copy of Template Classes ###
@@ -383,7 +390,7 @@ template <typename T>
 struct A {};
 
 template <typename T>
-struct B : using A<T> {};
+struct B = A<T> {};
 
 B<int> b;
 ```
@@ -396,7 +403,7 @@ template <typename T, typename U>
 struct A {};
 
 template <typename T>
-struct B : using A<T, double> {};
+struct B = A<T, double> {};
 
 B<int> b;
 ```
@@ -415,7 +422,7 @@ template <typename T>
 struct A<T, int> { T t; char z; };
 
 template <typename T>
-struct B : using A<T, double> {};
+struct B = A<T, double> {};
 
 /* Equivalent to
 
@@ -439,13 +446,13 @@ struct A { int x; };
 struct B { char c; };
 
 template <typename T>
-struct C : using A<T> {};
+struct C = A<T> {};
 
 template <>
-struct C<double> : using B {};
+struct C<double> = B {};
 
 template <>
-struct A<int> : using C<double> {};
+struct A<int> = C<double> {};
 
 // Can't be done, since A<int> creates C<int>
 // template<>
@@ -490,11 +497,11 @@ struct A {
 
 struct C;
 
-struct D : using B {
+struct D = B {
     using class C = A;
 };
 
-struct C : using A {
+struct C = A {
     using class D = B;
 };
 
@@ -523,8 +530,8 @@ Similarly, this could be done to type-copy whole hierarchies of classes.
 struct A {};
 struct B : A {};
 
-struct C : using A {};
-struct D : using B {
+struct C = A {};
+struct D = B {
     using class C = A;
 };
 ```
@@ -538,13 +545,13 @@ a class is a type-copy of another, or if it has been derived from a type-copy
 ```cpp
 struct Base {};
 
-struct Copy : using Base {};
+struct Copy = Base {};
 
 static_assert(std::is_copy_of<Copy, Base>::value);
 
 struct ChildCopy : public Copy {};
 
-struct CopyChildCopy : using ChildCopy {};
+struct CopyChildCopy = ChildCopy {};
 
 static_assert(std::is_copy_base_of<Base, CopyChildCopy>::value);
 ```
@@ -587,17 +594,17 @@ class IntWrapper final {
         int v_;
 };
 
-struct IntWrapperAsInt : using IntWrapper {
+struct IntWrapperAsInt = IntWrapper {
     operator int() { return v_; }
 };
 
-struct IntWrapperWithSum : using IntWrapper {
+struct IntWrapperWithSum = IntWrapper {
     IntWrapperWithSum operator+(IntWrapperWithSum other) {
         return v_ + other.v_;
     }
 };
 
-struct IntWrapperWithAlgebra : using IntWrapperWithSum {
+struct IntWrapperWithAlgebra = IntWrapperWithSum {
     // And so on...
     IntWrapperWithAlgebra operator-(IntWrapperWithAlgebra other);
     IntWrapperWithAlgebra operator/(IntWrapperWithAlgebra other);
