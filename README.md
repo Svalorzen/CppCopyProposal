@@ -132,6 +132,23 @@ understand (as it simply matches already the already understood mechanics of
 creating a new, unique type from nothing), and no new rules for type conversion
 and selection on overloads have to be created.
 
+Design Decisions
+----------------
+
+- It should be simple to create and extend a strong typedef of a given class as
+  it is when using inheritance.
+- The interface of types should be built incrementally, as it is now, and it
+  should not be possible to remove methods/attributes of the original type. This
+  allows to understand type hierarchies more easily.
+- Strong typedefs are considered as separate types, but it should be possible to
+  allow their usage in place of their original type with additional syntax.
+- Do not allow automatic creation of non-member functions for strong typedefs,
+  taking from non-member functions that use the original type in their
+  signature. Instead, we encourage usage of non-member templated functions.
+- Naive solutions such as `strong using StrongAlias = int` have been discarded
+  as they are not easily generalizable without introducing unintuitive corner
+  cases.
+
 Syntax
 ------
 
