@@ -90,14 +90,15 @@ to extend if one wants to copy a class but add additional functionality to it.
 
 ### Templates ###
 
-Templates produce for each instantiation a separate type. They are unfortunately
-not applicable to previously existing code. For new code, they would require the
+Templates produce a new type for each instantiation. They are unfortunately not
+applicable to previously existing code. For new code, they would require the
 creation of "fake" template parameters that would need to vary in order to
 produce separate types.
 
-In addition, class extension through templates is not possible: variations would
-need to be made through specialization, which itself requires copying existing
-code.
+In addition, another severe limitation is that class extension through templates
+is not possible: variations would need to be made either through specialization,
+which itself requires copying existing code, or though inheritance, with the
+previously mentioned pitfalls.
 
 Previous Work
 -------------
