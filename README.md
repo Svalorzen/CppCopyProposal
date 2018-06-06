@@ -257,32 +257,27 @@ struct MyIntConvertible = SumProdInt {
 
 ### Overloads ###
 
-A type-copy is a new, unique type, which cannot be substituted with its
-type-base nor other type-copies of any kind - unless appropriate conversion
-operators are explicitly added by the user. Overloads are resolved as if each
-type-copy is a unique type. Once again, the general rule of "behaves as if
-implemented by hand" applies.
+As a type-clone is a new, unique type, overloads are resolved separately for
+different type-clones (and type-bases).
 
 ```cpp
 class Position = std::pair<double, double> {};
 class Distance = std::pair<double, double> {};
 
-Position operator+(const Position & p, const Distance & d) {
-    return Position(p.first + d.first, p.second + d.second);
+Position operator+(const Position & lhs, const Distance & rhs) {
+    return Position(lhs.first + rhs.first, lhs.second + rhs.second);
 }
 
 Distance operator+(const Distance & lhs, const Distance & rhs) {
     return Distance(lhs.first + rhs.first, lhs.second + rhs.second);
 }
 
-// ...
-
 Position p(1, 1);
 Distance d(1, 1);
 
-p + d; // OK
-d + d; // OK
-p + p; // Error
+p + d; // OK, position + distance
+d + d; // OK, distance + distance
+p + p; // Error, can't sum two positions
 ```
 
 ### Nested Types, Friends and Non-Members ###
