@@ -49,10 +49,10 @@ be extended in a simple way while keeping the old interface intact.
 
 ### Inheritance ###
 
-Inheritance requires redefinition of all constructors, and creates a stricter
-dependency between two classes than what is proposed here. Classes may be
-converted to a common ancestor even though that is undesired or even dangerous
-in case of implicit conversions.
+Inheritance requires redefinition of constructors (although easier now with the
+`using` directive). Worse, it creates a tight dependency between two classes
+which very often not intended. Classes may be converted to a common ancestor
+even though that is undesired or even dangerous in case of implicit conversions.
 
 Inheritance may also be unwanted in order to avoid risks linked to polymorphism
 and freeing data structures where the base class does not have a virtual
