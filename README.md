@@ -184,9 +184,10 @@ the type-clone.
 In case of collisions between the new member function definitions, the new type
 is ill-formed.
 
-A similar approach is taken for member attributes, with the single exception
-that if they perfectly match in number, name, type, order and visibility in all
-type-bases, then the type-clone gets them directly, and there is no error.
+The same is true for member attributes, with the single exception that if they
+perfectly match in number, name, type, order and visibility in all type-bases,
+then they are merged in type-clone, which receives a single set of all of them,
+and there is no error.
 
 All method implementations for the type-clone would be the same as those from
 the type-base it comes from. The type-clone would inherit from the same classes
