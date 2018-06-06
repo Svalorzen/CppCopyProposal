@@ -19,9 +19,9 @@ Motivation
   have currently no simple way to indicate the semantic differences. Since a
   `typedef` does not allow a separate overload on the alias - since it is still
   the "old" type - libraries have to resort to imperfect techniques, such as
-  copying, wrapping or inheriting the needed type. Examples: coordinates in a
-  plane (rectangular, polar), vectors of double (probabilities, values),
-  separate physical values (kilograms, speeds).
+  manually copying, wrapping or inheriting the needed type. Examples:
+  coordinates in a plane (rectangular, polar), vectors of double (probabilities,
+  values), separate physical values (kilograms, speeds).
 - Easier maintainability of code which is known to be the same, rather than
   forcing multiple copies of the same code to coexist.
 - Avoiding misuse of inheritance in order to provide a copy-paste alternative.
