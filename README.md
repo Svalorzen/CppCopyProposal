@@ -363,6 +363,15 @@ at the same time minimizes the amount of redundancy.
 The choice to not extend the syntax to primitive types also mirrors the fact
 that in C++ it is not possible to inherit from primitive types.
 
+Extensions
+----------
+
+Possible extensions to the syntax might include:
+
+- Templatizing a type-clone
+- Using a templatized type-clone to clone a template class.
+- Special syntax to handle multiple dependent classes at the same time.
+- STL traits for type-cloned classes.
 
 Compatibility
 -------------
