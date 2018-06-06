@@ -143,10 +143,10 @@ Design Decisions
 - Strong typedefs are considered as separate types, but it should be possible to
   allow their usage in place of their original type with additional syntax.
 - Do not allow automatic creation of non-member functions for strong typedefs,
-  taking from non-member functions that use the original type in their
-  signature. Instead, we encourage usage of non-member templated functions.
+  even if those function existed for the original types. Instead, we encourage
+  usage of non-member templated functions.
 - Naive solutions such as `strong using StrongAlias = int` have been discarded
-  as they are not easily generalizable without introducing unintuitive corner
+  as they are not easily generalizable and tend to introduce non-obvious corner
   cases.
 
 Syntax
