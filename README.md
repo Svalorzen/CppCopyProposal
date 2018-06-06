@@ -282,15 +282,21 @@ p + p; // Error, can't sum two positions
 
 ### Nested Types, Friends and Non-Members ###
 
-A type-copy results in the duplication of all types and entities that directly
-depend on the base-type. It also results in the duplication of aliases. However,
-it does **not** include friends, nor it creates type-copies of non-member
-functions.
+A type-clone results in the duplication of all types and entities that directly
+depend on the base-type. It also results in the duplication of aliases. It does
+also include friends, although the original friend declaration was not templated
+it will result in a simple declaration. In no case non-member functions are
+duplicated automatically.
 
-While in a type-copy context, all nested types can be extended as if they were
-being type-copied themselves.
+While in a type-clone context, all nested types can be extended as if they were
+being type-cloned themselves.
 
 ```cpp
+
+template <typename T>
+void foo(T) {}
+
+void bar(Base) {}
 
 struct Base {
     using X = int;
@@ -301,14 +307,11 @@ struct Base {
 
     void useNested(Nested);
 
-    friend void foo(Base);
-    friend void bar() { std::cout << "bar\n"; }
+    friend void foo<Base>(Base);
+    friend void bar(Base);
 };
 
-void foo(Base b);
-void baz(Base::Nested n);
-
-struct Copy = Base {
+struct Clone = Base {
     struct Nested {
         int func();
     };
@@ -316,7 +319,7 @@ struct Copy = Base {
 
 /* Equivalent to
 
-struct Copy {
+struct Clone {
     using X = int;
 
     struct Nested {
@@ -326,10 +329,17 @@ struct Copy {
 
     void useNested(Nested);
 
+    friend void foo<Clone>(Clone);
+    friend void bar(Clone); // Declaration only, cannot be called as not defined
 };
 
 */
 ```
+
+Non-member non-template methods would need to be implemented by hand in order to
+work with the type-clone. This proposal encourages the usage of template
+non-member functions, as they perfectly fit the type of structures produced with
+this proposal.
 
 ### Primitive Types ###
 
