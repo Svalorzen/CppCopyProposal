@@ -181,7 +181,8 @@ which the type-bases appear in the `type_list`. For each type-base in the
 `type_list`, all mentions to that type-base in the cloned code is replaced by
 the type-clone.
 
-In case of collisions between the new definitions, the new type is ill-formed.
+In case of collisions between the new member function definitions, the new type
+is ill-formed.
 
 A similar approach is taken for member attributes, with the single exception
 that if they perfectly match in number, name, type, order and visibility in all
