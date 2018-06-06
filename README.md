@@ -152,106 +152,97 @@ Design Decisions
 Syntax
 ------
 
-### Simple Case ###
+In this proposal strong typedefs are declared and defined using a syntax very
+similar to inheritance. This is to both ease the intuition about the meaning of
+the code, and to emphasize that features must be added to types incrementally,
+rather than by removing features to existing types.
 
-A strong typedef is defined as follows:
-
-```cpp
-class Base {
-    public:
-        Base() : x(0) {}
-        void foo() { std::cout << "foo " << x << "\n"; }
-    private:
-        int x;
-};
-
-struct Copy = Base {};
-
-/* Equivalent to
-
-struct Copy {
-    public:
-        Copy() : x(0) {}
-        void foo() { std::cout << "foo " << x << "\n"; }
-    private:
-        int x;
-};
-
-*/
-```
-
-We refer to the newly created class as the *type-copy* of the original class. We
-also refer to the original class as the *type-base* of the *type-copy*. One
-cannot type-copy a class and inherit at the same time. If such a new class was
-needed one would need to create it by hand with the desired functionality and
-inheriting from the desired classes, as it would be done normally.
-
-All method implementations for the type-copy would be the same. The type-copy
-would inherit from the same classes its type-base inherits from. All explicitly
-defined constructors and destructors would work in the same way. Implicitly
-defined/deleted constructors and destructors may be overridden or deleted in the
-type-copy.
+Very simply, a strong typedef is defined in the following way:
 
 ```cpp
-struct A {
-    A(int);
-};
-// Impossible to construct
-struct B {
-    A a;
-};
-// Can be constructed
-struct C = B {
-    C(int i) : a(i) {}
+class type_name = type_list {
+    \* additional method/member definitions *\
 };
 ```
 
-Unless where noted, the new class behaves with respect to all C++ rules as if it
-had been implemented by hand.
+In this proposal we refer to the newly created class as the *type-clone* of the
+original classes. We also refer to the original classes as the *type-bases* of
+the *type-clone*. One cannot type-clone and use inheritance at the same time,
+even though it is possible to construct an equivalent result using intermediate
+helper types.
 
-### Adding New Functionality ###
+No type-base can be a primitive type. All type-bases in the `type_list` must be
+aggregates, but for at most one. This is to avoid constructor conflicts.
 
-A type-copy is allowed to define additional methods and attributes upon
-definition, as it would be done in a normal class definition. The type-copy has
-access to all its members in the same way the type-base has access to its own.
+All constructors, destructors, static and non-static member functions will be
+accessible in the new class directly, their visibility (private, public,
+protected) unchanged, as if they were declared in the order in which the
+type-bases appear in the `type_list`. For each type-base in the `type_list`, all
+mentions to that type-base in the cloned code is replaced by the type-clone.
 
-Note that additional attributes will be initialized in type-copied constructors
-in the same way as if they weren't specified at all. Additional constructors can
-be specified if needed.
+In case of collisions between the new definitions, the new type is ill-formed.
+
+A similar approach is taken for member attributes, with the single exception
+that if they perfectly match in number, name, type, order and visibility in all
+type-bases, then the type-clone gets them directly, and there is no error.
+
+All method implementations for the type-clone would be the same as those from
+the type-base it comes from. The type-clone would inherit from the same classes
+its type-bases inherit from. If the type-bases inherit from the same classes,
+the inheritance is collapsed (differently from how inheritance works, where
+diamonds can be created).
+
+The additional definitions that can be added in the type-clone must not conflict
+with the cloned ones, or the new definition is ill-formed. Added attributes are
+added after the cloned ones in terms of ordering.
+
+### A Simple Example ###
 
 ```cpp
-struct Base {
-    void foo() { std::cout << "foo\n"; }
-};
-
-struct Derived : public Base {};
-
-struct Copy = Base {
-    void bar() { std::cout << "bar\n"; }
-
-    int x;      // Unspecified on construction
-    int j = 10; // 10 on construction
-};
-
-struct CopyDerived = Derived {};
-
-/* Equivalent to
-
-struct Copy {
-    void foo() { std::cout << "foo\n"; }
-    void bar() { std::cout << "bar\n"; }
-
+class MyInt {
     int x;
-    int j = 10;
 };
 
-struct CopyDerived : public Base {};
+struct MyInts = MyInt {
+    int y;
+};
+
+/* Equivalent to
+
+struct MyInts {
+    private:
+        int x;
+    public:
+        int y;
+};
 
 */
-```
 
-All newly declared methods in the type-copy must of course be implemented in
-order to be used.
+struct SumInt = MyInt {
+    static SumInt operator+(SumInt lhs, SumInt rhs) { return {lhs.x + rhs.x}; }
+};
+
+struct ProdInt = MyInt {
+    static ProdInt operator*(ProdInt lhs, ProdInt rhs) { return {lhs.x * rhs.x}; }
+};
+
+// Valid as SumInt and ProdInt both have a single private attribute of type int
+// called x
+struct SumProdInt = SumInt, ProdInt {};
+// struct SumInts = MyInts, SumInt {}; Ill-formed since SumInt does not have int y;
+
+/* Equivalent to
+
+struct SumProdInt {
+    static SumProdInt operator+(SumProdInt lhs, SumProdInt rhs) { return {lhs.x + rhs.x}; }
+    static SumProdInt operator*(SumProdInt lhs, SumProdInt rhs) { return {lhs.x * rhs.x}; }
+    private:
+        int x;
+};
+
+*/
+
+```
 
 #### Interfacing with the Original Class ####
 
