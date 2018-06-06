@@ -247,31 +247,13 @@ struct SumProdInt {
 #### Interfacing with the Original Class ####
 
 In order to interface with a type-base, simple conversion operators can be added
-by the user explicitly if needed, in order to obtain the desired interface. Note
-that if more types with this kind of compatibility were needed, one would only
-need to implement them once, since recursively type-copying the type-copy would
-duplicate the new, more compatible interface with it.
+by the user explicitly if needed, in order to obtain the desired interface.
 
 ```cpp
-struct Base {
-    public:
-        int x;
-
-    private:
-        double y;
-};
-
-struct Copy = Base {
-    operator Base() { return Base{x, y}; }
+struct MyIntConvertible = SumProdInt {
+    operator MyInt() const { return {x}; }
 };
 ```
-
-`reinterpret_cast` may also be used to convert back to the original class,
-limited by the tool's already existing rules.
-
-In general the usual rules of `reinterpret_cast` apply to the copied classes
-with respect to their general classes, exactly as if the copied class had been
-implemented by hand.
 
 ### Overloads ###
 
