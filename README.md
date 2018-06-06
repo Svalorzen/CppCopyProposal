@@ -135,8 +135,8 @@ and selection on overloads have to be created.
 Design Decisions
 ----------------
 
-- It should be simple to create and extend a strong typedef of a given class as
-  it is when using inheritance.
+- Creating and extending a strong typedef of a given class should be as simple
+  as extending a class using inheritance.
 - The interface of types should be built incrementally, as it is now, and it
   should not be possible to remove methods/attributes of the original type. This
   allows to understand type hierarchies more easily.
