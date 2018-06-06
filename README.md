@@ -107,8 +107,8 @@ Strong typedefs have already been proposed for the C++ language multiple times
 ([N1706](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2004/n1706.pdf),
 [N1891](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2005/n1891.pdf),
 [N3515](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3515.pdf),
-[N3741](https://isocpp.org/files/papers/n3741.pdf)). These typedefs are named
-*opaque typedefs*, and these papers try to explore and define exactly the
+[N3741](https://isocpp.org/files/papers/n3741.pdf)). These papers refer to
+strong typedefs as *opaque typedefs*, and try to explore and define exactly the
 behavior that such typedefs should and would have when used to create new types.
 In particular, the keywords `public`, `protected` and `private` are used in
 order to create a specific relation with the original type to determine how the
