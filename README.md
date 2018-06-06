@@ -12,24 +12,25 @@ function overloads on syntactically identical but semantically different types
 The approach taken should be simple to implement and be applicable to existing
 code.
 
-Reasons
--------
+Motivation
+----------
 
 - Scientific libraries where a type has different behaviors depending on context
   have currently no simple way to indicate the semantic differences. Since a
-  `typedef` does not allow multiple overloads on new typedef types - since they
-  are still the "old" type - they have to resort to imperfect techniques, such
-  as copying, wrapping or inheriting the needed type. Examples: coordinates in a
-  plane (rectangular, polar), vectors of double (probabilities, values).
+  `typedef` does not allow a separate overload on the alias - since it is still
+  the "old" type - libraries have to resort to imperfect techniques, such as
+  copying, wrapping or inheriting the needed type. Examples: coordinates in a
+  plane (rectangular, polar), vectors of double (probabilities, values),
+  separate physical values (kilograms, speeds).
 - Easier maintainability of code which is known to be the same, rather than
-  being copy-pasted.
+  forcing multiple copies of the same code to coexist.
 - Avoiding misuse of inheritance in order to provide a copy-paste alternative.
   This can result in very deep hierarchies of types which should really not have
   anything to do with each other.
-- Enabling users to use an existing and presumably correct type but partially
-  extend it with context-specific methods. Examples: searching for
-  "`std::vector` inheritance" yields many results of users trying to maintain
-  the original interface and functionality but add one or two methods.
+- Enabling users to use existing and presumably correct types and extend them
+  with context-specific methods. Examples: searching for "`std::vector`
+  inheritance" yields many results of users trying to maintain the original
+  interface and functionality but add one or two methods.
 
 The functionality should have the following requirements:
 
