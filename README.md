@@ -9,8 +9,8 @@ while wrapping it in a new type, without the burden of inheritance and to allow
 function overloads on syntactically identical but semantically different types
 (also known as *strong typedef*).
 
-The approach taken should be simple to implement and be applicable to existing
-code.
+The approach taken strives to be simple to implement and to teach, while being
+applicable to existing code.
 
 Motivation
 ----------
