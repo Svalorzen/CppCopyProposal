@@ -351,55 +351,18 @@ strong typedefs.
 The main problem of creating a primitive type strong typedef is that the
 handling of all original operators - whether they should still work or not, and
 whether they should be compatible with the original type - depends heavily on
-context. Serial numbers should not be multiplied, for example. However, manually
-specifying whether each operator should be present or not is a very dull task.
+context. Serial numbers should not be multiplied, for example. This would
+require removal of operators from existing types, which goes contrary to the
+goals of this proposal (to have types be built incrementally).
 
-While wrapping a primitive type in a small class and exposing only the needed
-operators can work, this process becomes tedious to do many times, since
-inheritance cannot be used lest risk unwanted conversions.
+With this proposal we support what has been done to emulate strong typing up
+until now, i.e. explicitly write classes with the desired interfaces. This
+proposal simply enables a simple and relatively intuitive way to do so, which
+at the same time minimizes the amount of redundancy.
 
-However, this proposal makes wrapping and incrementally exposing operators easy,
-removes code duplication and prevents any unwanted conversions. While not
-perfect in all cases, as still some code must be written to expose global
-operators with base-types (as those are not copied), we argue that this system
-can still be useful in dealing with this problem.
-
-Once created, wrapper types can then be copied indefinitely when needed, and
-thus allow for a robust and efficient way to substitute for a lack of primitive
-type strong typedefs.
-
-```cpp
-class IntWrapper final {
-    public:
-        IntWrapper() : v_(0) {}
-        explicit IntWrapper(int v) : v_(v) {}
-        IntWrapper(const IntWrapper & other) : v_(other.v_) {}
-
-    private:
-        int v_;
-};
-
-struct IntWrapperAsInt = IntWrapper {
-    operator int() { return v_; }
-};
-
-struct IntWrapperWithSum = IntWrapper {
-    IntWrapperWithSum operator+(IntWrapperWithSum other) {
-        return v_ + other.v_;
-    }
-};
-
-struct IntWrapperWithAlgebra = IntWrapperWithSum {
-    // And so on...
-    IntWrapperWithAlgebra operator-(IntWrapperWithAlgebra other);
-    IntWrapperWithAlgebra operator/(IntWrapperWithAlgebra other);
-    IntWrapperWithAlgebra operator*(IntWrapperWithAlgebra other);
-    IntWrapperWithAlgebra operator%(IntWrapperWithAlgebra other);
-};
-```
-
-The choice of not extending this syntax to primitive types also mirrors the fact
+The choice to not extend the syntax to primitive types also mirrors the fact
 that in C++ it is not possible to inherit from primitive types.
+
 
 Compatibility
 -------------
