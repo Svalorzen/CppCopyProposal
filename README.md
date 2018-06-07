@@ -359,10 +359,9 @@ context. Serial numbers should not be multiplied, for example. This would
 require removal of operators from existing types, which goes contrary to the
 goals of this proposal (to have types be built incrementally).
 
-With this proposal we support what has been done to emulate strong typing up
-until now, i.e. explicitly write classes with the desired interfaces. This
-proposal simply enables a simple and relatively intuitive way to do so, which
-at the same time minimizes the amount of redundancy.
+With this proposal we support explicitly writing classes with the desired
+interfaces. This proposal enables a simple and relatively intuitive way to do
+so, which at the same time minimizes the amount of redundancy.
 
 The choice to not extend the syntax to primitive types also mirrors the fact
 that in C++ it is not possible to inherit from primitive types.
