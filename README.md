@@ -197,7 +197,7 @@ the inheritance is collapsed (differently from how inheritance works, where
 diamonds can be created).
 
 The additional definitions that can be added in the type-clone must not conflict
-with the cloned ones, or the new definition is ill-formed. Added attributes are
+with the cloned ones, or the new definition is ill-formed. New attributes are
 added after the cloned ones in terms of ordering.
 
 ### A Simple Example ###
