@@ -171,8 +171,9 @@ the *type-clone*. One cannot type-clone and use inheritance at the same time,
 even though it is possible to construct an equivalent result using intermediate
 helper types.
 
-No type-base can be a primitive type. All type-bases in the `type_list` must be
-aggregates, but for at most one. This is to avoid constructor conflicts.
+No type-base can be a primitive type. Of all the type-bases in the `type_list,
+at most one is allowed to have user-declared or inherited constructors. This is
+to avoid conflicts which can make the type-clone badly initialized.
 
 All constructors, destructors, static and non-static member functions will be
 accessible in the new class directly, their visibility (private, public,
