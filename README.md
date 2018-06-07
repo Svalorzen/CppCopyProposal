@@ -70,7 +70,8 @@ behave in the same way as before. This heightens the bar significantly for many
 users, since they may not know correctly how to duplicate an interface and how
 to forward parameters to the old interface correctly.
 
-The new code also must be maintained in case the old interface changes.
+The wrapping code also must be updated in case the old interface changes, which
+adds to the maintenance burden.
 
 ### Copying the Base Class ###
 
