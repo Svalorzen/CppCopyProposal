@@ -288,9 +288,9 @@ p + p; // Error, can't sum two positions
 
 A type-clone results in the duplication of all types and entities that directly
 depend on the base-type. It also results in the duplication of aliases. It does
-also include friends, although the original friend declaration was not templated
-it will result in a simple declaration. In no case non-member functions are
-duplicated automatically.
+also include friends, although if the original friend declaration was not
+templated it will result in a simple declaration. In no case non-member
+functions are duplicated automatically.
 
 While in a type-clone context, all nested types can be extended as if they were
 being type-cloned themselves.
