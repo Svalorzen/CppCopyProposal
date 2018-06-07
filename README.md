@@ -96,10 +96,10 @@ applicable to previously existing code. For new code, they would require the
 creation of "fake" template parameters that would need to vary in order to
 produce separate types.
 
-In addition, another severe limitation is that class extension through templates
-is not possible: variations would need to be made either through specialization,
-which itself requires copying existing code, or though inheritance, with the
-previously mentioned pitfalls.
+The CTRP technique can be used in order to extend types with useful
+functionality, but this technique has limitations regarding attributes. If the
+multiple CRTP interface which depend on the same attributes are joined, they
+will exist in parallel in the resulting class rather than merge.
 
 Previous Work
 -------------
