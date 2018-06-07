@@ -172,8 +172,9 @@ even though it is possible to construct an equivalent result using intermediate
 helper types.
 
 No type-base can be a primitive type. Of all the type-bases in the `type_list`,
-at most one is allowed to have user-declared or inherited constructors. This is
-to avoid conflicts which can make the type-clone badly initialized.
+at most one is allowed to have user-declared or inherited constructors or
+destructors. This is to avoid conflicts which can make the type-clone badly
+initialized or impossible to delete.
 
 All constructors, destructors, static and non-static member functions will be
 accessible in the new class directly, their visibility (private, public,
