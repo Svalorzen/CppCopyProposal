@@ -179,9 +179,8 @@ initialized or impossible to delete.
 All constructors, destructors, static and non-static member functions will be
 accessible in the new class directly, their visibility (private, public,
 protected) unchanged, as if they were declared in the type-clone  the order in
-which the type-bases appear in the `type_list`. For each type-base in the
-`type_list`, all mentions to that type-base in the cloned code is replaced by
-the type-clone.
+which the type-bases appear in the `type_list`. For each function so cloned, any
+mention of the type-base from which it was cloned is replaced by the type-clone.
 
 In case of collisions between the new member function definitions, the new type
 is ill-formed.
