@@ -108,13 +108,14 @@ Strong typedefs have already been proposed for the C++ language multiple times
 ([N1706](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2004/n1706.pdf),
 [N1891](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2005/n1891.pdf),
 [N3515](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3515.pdf),
-[N3741](https://isocpp.org/files/papers/n3741.pdf)). These papers refer to
-strong typedefs as *opaque typedefs*, and try to explore and define exactly the
-behavior that such typedefs should and would have when used to create new types.
-In particular, the keywords `public`, `protected` and `private` are used in
-order to create a specific relation with the original type to determine how the
-new type is allowed to be cast back to the original type or be used in its place
-during overloads.
+[N3741](https://isocpp.org/files/papers/n3741.pdf),
+[P0109](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0109r0.pdf)).
+These papers refer to strong typedefs as *opaque typedefs*, and try to explore
+and define exactly the behavior that such typedefs should and would have when
+used to create new types.  In particular, the keywords `public`, `protected` and
+`private` are used in order to create a specific relation with the original type
+to determine how the new type is allowed to be cast back to the original type or
+be used in its place during overloads.
 
 This document shares many of the same principles, for example (quoting from
 N3741):
@@ -125,13 +126,21 @@ N3741):
 >   not require that any enum type, reference type, array type, function type, or
 >   pointer-to-member type be allowed as an underlying type.
 
-However, this document tries to propose a possibly more simple approach, where
-a new language feature is introduced with the same meaning and functionality as
-if the user autonomously implemented a new class him/herself, matching the
-original type completely. Thus, it should result for the user more simple to
-understand (as it simply matches already the already understood mechanics of
-creating a new, unique type from nothing), and no new rules for type conversion
-and selection on overloads have to be created.
+Even the syntax proposed here can be easily compared to P0109. However, P0109
+takes great care into allowing method and access specification to primitive
+types. The difficulty of treating primitive types in this way in an unambiguous
+way is very hard, as is also exemplified by the fact that inheriting from
+primitive is disallowed, as there is no clear way to do so.
+
+Additionally, P0109 heavily focuses on *trampolines*, a new concept that allows
+to include or disregard methods from the original class. On the other hand, it
+does not consider the possibility of extending the new types.
+
+This document tries to propose a possibly more straightforward approach, which
+meaningfully mimics existing code and understanding. We introduce a language
+feature to extend existing types with a similar syntax to inheritance. This
+framework matches the mechanics of creating a new, unique type from scratch, and
+no new rules for type conversion and selection on overloads have to be created.
 
 Design Decisions
 ----------------
