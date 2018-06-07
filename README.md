@@ -148,8 +148,10 @@ Design Decisions
 - Creating and extending a strong typedef of a given class should be as simple
   as extending a class using inheritance.
 - The interface of types should be built incrementally, as it is now, and it
-  should not be possible to remove methods/attributes of the original type. This
-  allows to understand type hierarchies more easily.
+  should not be possible to remove methods/attributes of the original type. We
+  explicitly do not consider the ability to remove existing functionality, as it
+  would make it much harder, if not nearly impossible, to understand large type
+  hierarchies.
 - Strong typedefs are considered as separate types, but it should be possible to
   allow their usage in place of their original type with additional syntax.
 - Do not allow automatic creation of non-member functions for strong typedefs,
