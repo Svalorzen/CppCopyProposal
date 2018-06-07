@@ -1,5 +1,5 @@
-Duplication and Extension of Existing Classes
-=============================================
+Complementing Inheritance with Strong Typing
+============================================
 
 Introduction
 ------------
