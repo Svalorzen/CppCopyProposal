@@ -130,7 +130,8 @@ Even the syntax proposed here can be easily compared to P0109. However, P0109
 takes great care into allowing method and access specification to primitive
 types. The difficulty of treating primitive types in this way in an unambiguous
 way is very hard, as is also exemplified by the fact that inheriting from
-primitive is disallowed, as there is no clear way to do so.
+primitive is disallowed, as there is no clear way to do so. Complex types are
+additionally not explored much in the proposal.
 
 Additionally, P0109 heavily focuses on *trampolines*, a new concept that allows
 to include or disregard methods from the original class. On the other hand, it
@@ -138,7 +139,7 @@ does not consider the possibility of extending the new types.
 
 This document tries to propose a possibly more straightforward approach, which
 meaningfully mimics existing code and understanding. We introduce a language
-feature to extend existing types with a similar syntax to inheritance. This
+feature to extend any object type with a similar syntax to inheritance. This
 framework matches the mechanics of creating a new, unique type from scratch, and
 no new rules for type conversion and selection on overloads have to be created.
 
