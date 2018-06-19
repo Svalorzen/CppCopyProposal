@@ -174,7 +174,7 @@ Very simply, a strong typedef is defined in the following way:
 
 ```cpp
 class type_name = type_list {
-    \* additional method/member definitions *\
+    /* additional method/member definitions */
 };
 ```
 
