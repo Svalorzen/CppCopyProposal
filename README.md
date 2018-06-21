@@ -236,11 +236,11 @@ struct MyInts {
 */
 
 struct SumInt = MyInt {
-    static SumInt operator+(SumInt lhs, SumInt rhs) { return {lhs.x + rhs.x}; }
+    friend SumInt operator+(SumInt lhs, SumInt rhs) { return {lhs.x + rhs.x}; }
 };
 
 struct ProdInt = MyInt {
-    static ProdInt operator*(ProdInt lhs, ProdInt rhs) { return {lhs.x * rhs.x}; }
+    friend ProdInt operator*(ProdInt lhs, ProdInt rhs) { return {lhs.x * rhs.x}; }
 };
 
 // Valid as SumInt and ProdInt both have a single private attribute of type int
@@ -251,8 +251,8 @@ struct SumProdInt = SumInt, ProdInt {};
 /* Equivalent to
 
 struct SumProdInt {
-    static SumProdInt operator+(SumProdInt lhs, SumProdInt rhs) { return {lhs.x + rhs.x}; }
-    static SumProdInt operator*(SumProdInt lhs, SumProdInt rhs) { return {lhs.x * rhs.x}; }
+    friend SumProdInt operator+(SumProdInt lhs, SumProdInt rhs) { return {lhs.x + rhs.x}; }
+    friend SumProdInt operator*(SumProdInt lhs, SumProdInt rhs) { return {lhs.x * rhs.x}; }
     private:
         int x;
 };
